@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- import web3.js package -->
+    <!-- this is web3@0.x, please do not change to web3@1.x, otherwise the application will break -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@0.20.7/index.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Ethereum Smart Contract Demo</h1>
+      <label></label><input type="text" id="data" /> &nbsp;&nbsp;
+      <button id="write">Overwrite Data</button>
+      <br />
+      <br />
+      <button id="query">Query</button><br />
+      <span id="info"></span>
+      <br />
+    </div>
+
+    <script>
+      if (typeof web3 !== "undefined") {
+        web3 = new Web3(web3.currentProvider);
+      } else {
+        // Set the provider you want from Web3.providers
+        web3 = new Web3(
+          new Web3.providers.HttpProvider("http://localhost:8545")
+        );
+      }
+
+      // set ABI
+      var abi = [
+        {
+          constant: false,
+          inputs: [
+            {
+              name: "x",
+              type: "uint256",
+            },
+          ],
+          name: "set",
+          outputs: [],
+          payable: false,
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          constant: true,
+          inputs: [],
+          name: "get",
+          outputs: [
+            {
+              name: "",
+              type: "uint256",
+            },
+          ],
+          payable: false,
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+
+      //set contract address
+      var contractAddress = "FILL YOUR CONTRACT ADDRESS";
+
+      // create the contract information
+      var contractInfo = web3.eth.contract(abi);
+
+      // get the contract
+      var contract = contractInfo.at(contractAddress);
+
+      // enable the pop-up window for metamask
+      window.ethereum.enable();
+
+      // get the DOM element to display the results
+      var info = document.getElementById("info");
+
+      // call the contract the get the data
+      $("#query").click(function () {
+        contract.get(function (error, result) {
+          if (!error) {
+            var re = result;
+            info.innerHTML = info.innerHTML + re["c"][0] + "<br>";
+          }
+        });
+      });
+
+      // call the contract to write the data
+      $("#write").click(function () {
+        var data = $("#data").val();
+        contract.set(data, function (error, result) {
+          if (!error) {
+            console.log("ok");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
